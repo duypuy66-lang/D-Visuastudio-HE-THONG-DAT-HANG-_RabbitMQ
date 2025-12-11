@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hệ Thống Đặt Hàng</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 3em;">📦</div>
+                    <div>
+                        <h1>Hệ Thống Đặt Hàng</h1>
+                        <p class="subtitle">Quản lý đơn hàng real-time với Spring Boot 3.5</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <button class="nav-btn active" onclick="showTab('dashboard', event)">
+                <span style="font-size: 1.3em;">📊</span> Dashboard
+            </button>
+            <button class="nav-btn" onclick="showTab('orders', event)">
+                <span style="font-size: 1.3em;">📋</span> Danh Sách
+            </button>
+            <button class="nav-btn" onclick="showTab('create', event)">
+                <span style="font-size: 1.3em;">➕</span> Tạo Đơn
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <h2>📊 Thống Kê Chung</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">Tổng Đơn Hàng</div>
+                        <div class="stat-icon">📦</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedOrders">0</div>
+                        <div class="stat-label">Hoàn Thành</div>
+                        <div class="stat-icon">✅</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="processingOrders">0</div>
+                        <div class="stat-label">Đang Xử Lý</div>
+                        <div class="stat-icon">⏳</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="errorOrders">0</div>
+                        <div class="stat-label">Lỗi</div>
+                        <div class="stat-icon">❌</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                    <h2>📋 Đơn Hàng Gần Đây</h2>
+                    <button onclick="loadDashboard()" class="btn btn-secondary" style="margin-top: 0;">🔄 Tải Lại</button>
+                </div>
+                <div id="recentOrdersList" class="orders-list"></div>
+            </section>
+
+            <!-- Orders Tab -->
+            <section id="orders" class="tab-content">
+                <h2>📋 Danh Sách Đơn Hàng</h2>
+                <div class="filter-section">
+                    <input type="text" id="searchOrderId" placeholder="Tìm kiếm ID đơn hàng..." class="search-input" onkeypress="if(event.key==='Enter') searchOrder()">
+                    <button onclick="searchOrder()" class="btn btn-primary">🔍 Tìm Kiếm</button>
+                    <button onclick="loadAllOrders()" class="btn btn-secondary">🔄 Tải Lại</button>
+                </div>
+                <div id="allOrdersList" class="orders-list"></div>
+            </section>
+
+            <!-- Create Order Tab -->
+            <section id="create" class="tab-content">
+                <h2>➕ Tạo Đơn Hàng Mới</h2>
+                <form id="createOrderForm" class="order-form">
+                    <div class="form-group">
+                        <label for="customerName">👤 Tên Khách Hàng:</label>
+                        <input type="text" id="customerName" required placeholder="Nhập tên khách hàng">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productId">🛍️ Sản Phẩm:</label>
+                        <select id="productId" required>
+                            <option value="">-- Chọn sản phẩm --</option>
+                            <option value="P-001">P-001 - Tồn: 100 cái</option>
+                            <option value="P-002">P-002 - Tồn: 50 cái</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">📦 Số Lượng:</label>
+                        <input type="number" id="quantity" required min="1" placeholder="Nhập số lượng" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalPrice">💰 Tổng Giá:</label>
+                        <input type="number" id="totalPrice" required min="0" step="1000" placeholder="Nhập tổng giá" value="0">
+                    </div>
+
+                    <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px;">✅ Tạo Đơn Hàng</button>
+                    <div id="formMessage" class="message"></div>
+                </form>
+
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="margin-bottom: 12px;">💡 Hướng Dẫn Nhanh</h3>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>Nhập tên khách hàng đầy đủ</li>
+                        <li>Chọn sản phẩm từ danh sách</li>
+                        <li>Nhập số lượng (phải > 0)</li>
+                        <li>Nhập tổng giá (phải >= 0)</li>
+                        <li>Click "Tạo Đơn Hàng" để xác nhận</li>
+                        <li>Sau 1-2 giây, đơn sẽ xuất hiện trong Dashboard</li>
+                    </ul>
+                </div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="background: white; padding: 20px; margin-top: 30px; border-radius: 12px; text-align: center; color: #666; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <p>🚀 Hệ Thống Đặt Hàng | Spring Boot 3.5.0 | Dashboard Web v1.0</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Xây dựng với HTML, CSS, JavaScript và Spring REST API</p>
+        </footer>
+    </div>
+
+    <!-- Modal Chi tiết đơn hàng -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>📋 Chi Tiết Đơn Hàng</h2>
+            <div id="orderDetails" class="order-details"></div>
+            <h3 style="margin-top: 20px;">⏱️ Trạng Thái Xử Lý</h3>
+            <div id="orderStatus" class="order-status"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
